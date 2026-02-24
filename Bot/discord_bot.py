@@ -39,18 +39,24 @@ class GitLabBot(commands.Bot):
         from views.main_menu import MainMenuView
         self.add_view(MainMenuView())
 
-        # Загрузка cogs
+        # Загрузка cogs (команды)
         cog_extensions = [
             "cogs.general",
             "cogs.subscriptions",
             "cogs.pipelines",
         ]
-        for ext in cog_extensions:
+        # Фоновые задачи (tasks)
+        task_extensions = [
+            "tasks.pipeline_checker",
+            "tasks.camera_checker",
+            "tasks.stats_sender",
+        ]
+        for ext in cog_extensions + task_extensions:
             try:
                 await self.load_extension(ext)
-                logger.info(f"Загружен cog: {ext}")
+                logger.info(f"Загружен: {ext}")
             except Exception as e:
-                logger.error(f"Ошибка загрузки cog {ext}: {e}")
+                logger.error(f"Ошибка загрузки {ext}: {e}")
 
         # Синхронизация slash-команд для guild
         if DISCORD_GUILD_ID:
