@@ -16,9 +16,9 @@
   "database": {
     "user": "bot_user",
     "password": "bot_password",
-    "host": "gitlabbot-postgresql",
+    "host": "bot-postgres",
     "port": 5432,
-    "database": "bot_postgres"
+    "database": "bot_db"
   },
   "allure_report_url": "http://qa.video.rt.ru:8080/ui/",
   "jobs": {
