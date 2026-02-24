@@ -43,6 +43,7 @@ class GitLabBot(commands.Bot):
         cog_extensions = [
             "cogs.general",
             "cogs.subscriptions",
+            "cogs.pipelines",
         ]
         for ext in cog_extensions:
             try:

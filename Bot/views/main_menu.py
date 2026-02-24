@@ -41,10 +41,15 @@ class MainMenuView(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         """Открыть меню пайплайнов."""
-        await interaction.response.send_message(
-            "Меню пайплайнов будет доступно в следующем обновлении.",
-            ephemeral=True,
+        from views.pipeline_views import PipelineProjectSelectView
+
+        view = PipelineProjectSelectView()
+        embed = discord.Embed(
+            title="Пайплайны",
+            description="Выберите проект:",
+            color=discord.Color.blurple(),
         )
+        await interaction.response.edit_message(embed=embed, view=view)
 
     @discord.ui.button(
         label="Справка",
@@ -62,6 +67,8 @@ class MainMenuView(discord.ui.View):
                 "**Доступные команды:**\n"
                 "`/start` — Главное меню\n"
                 "`/help` — Справка\n"
+                "`/subscribe` — Управление подписками\n"
+                "`/pipelines` — Пайплайны и отчёты\n"
                 "`/request_access` — Запрос доступа\n\n"
                 "**Кнопки меню:**\n"
                 "**Подписки** — управление подписками на проекты\n"
