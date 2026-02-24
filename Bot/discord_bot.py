@@ -1,12 +1,14 @@
 """Точка входа Discord-бота для мониторинга GitLab."""
 
+import asyncio
 import logging
 
 import discord
+import uvicorn
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from config_loader import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID
+from config_loader import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, WEBHOOK_PORT
 
 load_dotenv()
 
@@ -44,6 +46,8 @@ class GitLabBot(commands.Bot):
             "cogs.general",
             "cogs.subscriptions",
             "cogs.pipelines",
+            "cogs.admin",
+            "cogs.testit",
         ]
         # Фоновые задачи (tasks)
         task_extensions = [
@@ -69,9 +73,23 @@ class GitLabBot(commands.Bot):
             logger.info("Slash-команды синхронизированы глобально")
 
     async def on_ready(self) -> None:
-        """Событие подключения к Discord."""
+        """Событие подключения к Discord + запуск вебхук-сервера."""
         logger.info(f"Бот подключён как {self.user} (ID: {self.user.id})")
         logger.info(f"Серверов: {len(self.guilds)}")
+
+        # Запуск FastAPI вебхука для Test IT
+        try:
+            from testit_webhook import create_app
+
+            app = create_app(self)
+            config = uvicorn.Config(
+                app, host="0.0.0.0", port=WEBHOOK_PORT, log_level="info"
+            )
+            server = uvicorn.Server(config)
+            asyncio.create_task(server.serve())
+            logger.info(f"TestIT webhook запущен на порту {WEBHOOK_PORT}")
+        except Exception as e:
+            logger.error(f"Не удалось запустить TestIT webhook: {e}")
 
 
 bot = GitLabBot()

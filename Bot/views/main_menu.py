@@ -69,7 +69,9 @@ class MainMenuView(discord.ui.View):
                 "`/help` — Справка\n"
                 "`/subscribe` — Управление подписками\n"
                 "`/pipelines` — Пайплайны и отчёты\n"
-                "`/request_access` — Запрос доступа\n\n"
+                "`/request_access` — Запрос доступа\n"
+                "`/admin` — Панель администратора\n"
+                "`/testit` — Настройки Test IT\n\n"
                 "**Кнопки меню:**\n"
                 "**Подписки** — управление подписками на проекты\n"
                 "**Пайплайны** — история и управление пайплайнами\n"
@@ -89,10 +91,15 @@ class MainMenuView(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         """Открыть админ-панель."""
-        await interaction.response.send_message(
-            "Админ-панель будет доступна в следующем обновлении.",
-            ephemeral=True,
+        from views.admin_views import AdminPanelView
+
+        embed = discord.Embed(
+            title="Админ-панель",
+            description="Выберите действие:",
+            color=discord.Color.red(),
         )
+        view = AdminPanelView()
+        await interaction.response.edit_message(embed=embed, view=view)
 
 
 def get_main_menu_embed() -> discord.Embed:
