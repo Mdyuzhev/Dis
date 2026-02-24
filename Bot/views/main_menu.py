@@ -21,10 +21,15 @@ class MainMenuView(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ) -> None:
         """Открыть меню подписок."""
-        await interaction.response.send_message(
-            "Меню подписок будет доступно в следующем обновлении.",
-            ephemeral=True,
+        from views.subscription_views import SubscriptionMenuView
+
+        view = await SubscriptionMenuView.create_with_state(interaction)
+        embed = discord.Embed(
+            title="Подписки",
+            description="Выберите проект или тип подписки:",
+            color=discord.Color.blurple(),
         )
+        await interaction.response.edit_message(embed=embed, view=view)
 
     @discord.ui.button(
         label="Пайплайны",

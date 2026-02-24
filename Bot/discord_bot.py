@@ -42,6 +42,7 @@ class GitLabBot(commands.Bot):
         # Загрузка cogs
         cog_extensions = [
             "cogs.general",
+            "cogs.subscriptions",
         ]
         for ext in cog_extensions:
             try:
