@@ -1,0 +1,11 @@
+discord.py>=2.3
+asyncpg
+requests
+httpx
+SQLAlchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic
+python-dotenv
+
+fastapi
+uvicorn[standard]

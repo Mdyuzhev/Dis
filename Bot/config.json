@@ -1,0 +1,36 @@
+{
+  "discord_bot_token": "YOUR_TOKEN",
+  "discord_guild_id": 0,
+  "discord_admin_role": "BotAdmin",
+  "gitlab_api_url": "https://code.video.rt.ru/api/v4/",
+  "gitlab_private_token": "nezkmnZD186WH72fvvnz",
+  "gitlab_private_token_user": "VXxzPzqyyz4LztTzS4g1",
+  "fixed_projects": {
+    "1087": "VCFront API",
+    "1201": "VCFront UI",
+    "2185": "WB-Adapter",
+    "2132": "VStoreAPI",
+    "2060": "VMS",
+    "2268": "VNDesktop"
+  },
+  "database": {
+    "user": "bot_user",
+    "password": "bot_password",
+    "host": "gitlabbot-postgresql",
+    "port": 5432,
+    "database": "bot_postgres"
+  },
+  "allure_report_url": "http://qa.video.rt.ru:8080/ui/",
+  "jobs": {
+    "check_new_pipelines_interval": 300,
+    "check_new_mrs_interval": 300,
+    "check_camera_statuses_interval": 300,
+    "check_camera_discrepancies_interval": 300,
+    "first_run_seconds": 10
+  },
+  "camera_manage_api_url": "http://camera-manager.platform.vc.restr.im",
+  "testit_api_url": "http://tmslt-1.video.rt.ru",
+  "testit_api_key": "ZTJmc3RCZ2hud2ozNEpmV2gz",
+  "webhook_secret": "odqqK8UZDaqRN1zhYGhY0Viuko2sO1WoWTQxFTX6CJx",
+  "webhook_port": 8000
+}
