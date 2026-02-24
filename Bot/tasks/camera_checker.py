@@ -393,7 +393,7 @@ class CameraChecker(commands.Cog):
                         d["detected_at"].replace("Z", "+00:00")
                     )
                 except ValueError:
-                    detected_at = datetime.utcnow()
+                    detected_at = datetime.now(timezone.utc)
 
                 await conn.execute(
                     """INSERT INTO camera_discrepancy_events
@@ -413,7 +413,7 @@ class CameraChecker(commands.Cog):
                     old_account_email,
                     new_account_email,
                     True,
-                    datetime.utcnow(),
+                    datetime.now(timezone.utc),
                 )
 
                 embed = format_camera_discrepancy_embed(

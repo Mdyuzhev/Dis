@@ -568,21 +568,38 @@ async def _deliver_embed(
     sub: dict,
     embed: discord.Embed,
 ) -> Optional[discord.Message]:
-    """Отправляет embed в канал/тред/DM по данным подписки."""
+    """Отправляет embed в канал/тред/DM по данным подписки.
+
+    Обрабатывает Forbidden (DM заблокированы) и NotFound (канал удалён).
+    """
     source_type = sub["source_type"]
 
-    if source_type == "dm":
-        user = bot.get_user(sub["user_id"]) or await bot.fetch_user(sub["user_id"])
-        return await user.send(embed=embed)
+    try:
+        if source_type == "dm":
+            user = bot.get_user(sub["user_id"]) or await bot.fetch_user(sub["user_id"])
+            return await user.send(embed=embed)
 
-    if source_type == "thread" and sub["thread_id"]:
-        thread = bot.get_channel(sub["thread_id"])
-        if thread is None:
-            thread = await bot.fetch_channel(sub["thread_id"])
-        return await thread.send(embed=embed)
+        if source_type == "thread" and sub["thread_id"]:
+            thread = bot.get_channel(sub["thread_id"])
+            if thread is None:
+                thread = await bot.fetch_channel(sub["thread_id"])
+            return await thread.send(embed=embed)
 
-    # channel
-    channel = bot.get_channel(sub["channel_id"])
-    if channel is None:
-        channel = await bot.fetch_channel(sub["channel_id"])
-    return await channel.send(embed=embed)
+        # channel
+        channel = bot.get_channel(sub["channel_id"])
+        if channel is None:
+            channel = await bot.fetch_channel(sub["channel_id"])
+        return await channel.send(embed=embed)
+
+    except discord.Forbidden:
+        logger.warning(
+            f"Нет прав на отправку: source={source_type}, "
+            f"user={sub.get('user_id')}, channel={sub.get('channel_id')}"
+        )
+        return None
+    except discord.NotFound:
+        logger.warning(
+            f"Канал/пользователь не найден: source={source_type}, "
+            f"user={sub.get('user_id')}, channel={sub.get('channel_id')}"
+        )
+        return None

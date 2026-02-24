@@ -1,7 +1,7 @@
 """Фоновые задачи: проверка пайплайнов и MR."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from discord.ext import commands, tasks
 
@@ -98,9 +98,9 @@ class PipelineChecker(commands.Cog):
                                 created_at_str.replace("Z", "+00:00")
                             )
                         else:
-                            created_at = datetime.utcnow()
+                            created_at = datetime.now(timezone.utc)
                     except Exception:
-                        created_at = datetime.utcnow()
+                        created_at = datetime.now(timezone.utc)
 
                     stand_value, schedule_id = await find_stand_and_schedule_id(
                         project_id, pid

@@ -42,6 +42,10 @@ class TestITCog(commands.Cog):
             )
         else:
             logger.error(f"Ошибка в testit: {error}", exc_info=True)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(
+                    "Произошла ошибка.", ephemeral=True
+                )
 
 
 async def setup(bot: commands.Bot) -> None:

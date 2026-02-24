@@ -5,6 +5,7 @@ import logging
 
 import discord
 import uvicorn
+from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -35,11 +36,14 @@ class GitLabBot(commands.Bot):
             intents=intents,
             help_command=None,
         )
+        self._webhook_started = False
 
     async def setup_hook(self) -> None:
         """Загрузка cogs и persistent views при старте."""
         from views.main_menu import MainMenuView
-        self.add_view(MainMenuView())
+
+        # show_admin=True чтобы все custom_id (включая main:admin) были зарегистрированы
+        self.add_view(MainMenuView(show_admin=True))
 
         # Загрузка cogs (команды)
         cog_extensions = [
@@ -72,10 +76,37 @@ class GitLabBot(commands.Bot):
             await self.tree.sync()
             logger.info("Slash-команды синхронизированы глобально")
 
+        # Глобальный обработчик ошибок slash-команд
+        self.tree.on_error = self._on_app_command_error
+
+    async def _on_app_command_error(
+        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+    ) -> None:
+        """Глобальный обработчик ошибок slash-команд."""
+        if isinstance(error, app_commands.MissingRole):
+            await interaction.response.send_message(
+                "Недостаточно прав для выполнения команды.", ephemeral=True
+            )
+        elif isinstance(error, app_commands.CommandOnCooldown):
+            await interaction.response.send_message(
+                f"Команда на перезарядке. Повторите через {error.retry_after:.0f}с.",
+                ephemeral=True,
+            )
+        else:
+            logger.error(f"Ошибка команды: {error}", exc_info=True)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(
+                    "Произошла ошибка при выполнении команды.", ephemeral=True
+                )
+
     async def on_ready(self) -> None:
         """Событие подключения к Discord + запуск вебхук-сервера."""
         logger.info(f"Бот подключён как {self.user} (ID: {self.user.id})")
         logger.info(f"Серверов: {len(self.guilds)}")
+
+        # Защита от повторного запуска при реконнекте
+        if self._webhook_started:
+            return
 
         # Запуск FastAPI вебхука для Test IT
         try:
@@ -87,6 +118,7 @@ class GitLabBot(commands.Bot):
             )
             server = uvicorn.Server(config)
             asyncio.create_task(server.serve())
+            self._webhook_started = True
             logger.info(f"TestIT webhook запущен на порту {WEBHOOK_PORT}")
         except Exception as e:
             logger.error(f"Не удалось запустить TestIT webhook: {e}")
